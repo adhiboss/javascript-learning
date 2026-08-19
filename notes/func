@@ -1,0 +1,8 @@
+3. FunctionsFunctions are blocks of code designed to perform particular tasks. JavaScript handles them via three primary syntaxes:Function DeclarationHoisted to the top of their scope, meaning they can be called before they are declared in the code.javascriptfunction greet(user) {
+    return `Hello, ${user}!`;
+}
+Use code with caution.Function ExpressionNot hoisted; they must be defined before they are executed.javascriptconst greet = function(user) {
+    return `Hello, ${user}!`;
+};
+Use code with caution.Arrow Functions (ES6)Shorter syntax that does not have its own this context. Instead, it inherits this lexically from the surrounding scope.javascriptconst greet = (user) => `Hello, ${user}!`;
+Use code with caution.
