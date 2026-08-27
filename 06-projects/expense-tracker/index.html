@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expense Tracker</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>Expense Tracker</h1>
+
+        <p class="subtitle">
+            Track your daily spending with JavaScript.
+        </p>
+
+
+        <!-- Summary -->
+
+        <section class="summary">
+
+            <div class="card">
+                <span>Total Expenses</span>
+                <strong id="total">₹0</strong>
+            </div>
+
+            <div class="card">
+                <span>Number of Expenses</span>
+                <strong id="count">0</strong>
+            </div>
+
+        </section>
+
+
+        <!-- Add Expense -->
+
+        <section class="form-section">
+
+            <h2>Add Expense</h2>
+
+            <form id="expenseForm">
+
+                <input
+                    type="text"
+                    id="description"
+                    placeholder="Expense description"
+                    required
+                >
+
+                <input
+                    type="number"
+                    id="amount"
+                    placeholder="Amount"
+                    min="1"
+                    required
+                >
+
+                <select id="category">
+
+                    <option value="Food">Food</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+
+                </select>
+
+                <button type="submit">
+                    Add Expense
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- Expense List -->
+
+        <section>
+
+            <h2>Expenses</h2>
+
+            <div id="expenseList"></div>
+
+        </section>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
