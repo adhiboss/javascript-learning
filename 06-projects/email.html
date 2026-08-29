@@ -1,0 +1,1583 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agentic AI Email Agent</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #f3f6fb;
+    color: #172033;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    background: #101828;
+    color: white;
+    padding: 22px 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+}
+
+.logo h1 {
+    font-size: 21px;
+}
+
+.logo p {
+    font-size: 12px;
+    color: #98a2b3;
+    margin-top: 3px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+/* ================= LAYOUT ================= */
+
+.container {
+    width: 94%;
+    max-width: 1450px;
+    margin: 25px auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 20px;
+}
+
+/* ================= CARD ================= */
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 23px;
+    box-shadow: 0 4px 18px rgba(16,24,40,.07);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.card-title h2 {
+    font-size: 18px;
+}
+
+.badge {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* ================= FORM ================= */
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #344054;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #2563eb;
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* ================= BUTTONS ================= */
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    padding: 12px 17px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.primary {
+    background: #2563eb;
+    color: white;
+}
+
+.primary:hover {
+    background: #1d4ed8;
+}
+
+.secondary {
+    background: #eef2f6;
+    color: #344054;
+}
+
+.success {
+    background: #16a34a;
+    color: white;
+}
+
+.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ================= AGENT ================= */
+
+.agent-box {
+    background: #101828;
+    color: white;
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.agent-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.agent-header h3 {
+    font-size: 15px;
+}
+
+.agent-header p {
+    font-size: 11px;
+    color: #98a2b3;
+    margin-top: 3px;
+}
+
+/* ================= STEPS ================= */
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px;
+    background: #182230;
+    border-radius: 8px;
+    color: #98a2b3;
+    font-size: 13px;
+}
+
+.step-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #344054;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.step.active {
+    color: white;
+}
+
+.step.active .step-icon {
+    background: #2563eb;
+}
+
+.step.complete {
+    color: #86efac;
+}
+
+.step.complete .step-icon {
+    background: #16a34a;
+}
+
+/* ================= ANALYSIS ================= */
+
+.analysis {
+    margin-top: 20px;
+}
+
+.analysis-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid #eaecf0;
+    font-size: 13px;
+}
+
+.analysis-item span:first-child {
+    color: #667085;
+}
+
+/* ================= SCORE ================= */
+
+.score {
+    margin-top: 18px;
+    text-align: center;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.score-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #16a34a;
+}
+
+.score p {
+    color: #667085;
+    font-size: 12px;
+}
+
+/* ================= PREVIEW ================= */
+
+.preview {
+    background: #f8fafc;
+    border: 1px solid #eaecf0;
+    border-radius: 10px;
+    padding: 18px;
+    min-height: 240px;
+}
+
+.preview-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.preview-header div {
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+.preview-body {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* ================= ACTIVITY ================= */
+
+.activity {
+    margin-top: 20px;
+}
+
+.log {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.log-item {
+    padding: 10px;
+    border-bottom: 1px solid #eaecf0;
+    font-size: 12px;
+}
+
+.log-time {
+    color: #98a2b3;
+    margin-right: 8px;
+}
+
+/* ================= TOAST ================= */
+
+.toast {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    background: #101828;
+    color: white;
+    padding: 14px 18px;
+    border-radius: 9px;
+    display: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,.2);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:600px) {
+    header {
+        padding: 18px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        width: 92%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            ✉
+        </div>
+
+        <div>
+            <h1>MailPilot AI</h1>
+            <p>Agentic Email Assistant</p>
+        </div>
+
+    </div>
+
+    <div class="status">
+        <span class="status-dot"></span>
+        Agent Online
+    </div>
+
+</header>
+
+
+<div class="container">
+
+<div class="grid">
+
+<!-- =================================================
+     LEFT SIDE
+================================================= -->
+
+<div>
+
+    <div class="card">
+
+        <div class="card-title">
+
+            <h2>✍️ Create Email</h2>
+
+            <span class="badge">
+                AI POWERED
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <div>
+
+                <label>Recipient</label>
+
+                <input
+                    id="recipient"
+                    type="email"
+                    placeholder="manager@example.com"
+                >
+
+            </div>
+
+            <div>
+
+                <label>Recipient Name</label>
+
+                <input
+                    id="recipientName"
+                    placeholder="John"
+                >
+
+            </div>
+
+        </div>
+
+
+        <label>Email Purpose</label>
+
+        <select id="purpose">
+
+            <option value="meeting">
+                Request a meeting
+            </option>
+
+            <option value="followup">
+                Follow up
+            </option>
+
+            <option value="leave">
+                Request leave
+            </option>
+
+            <option value="job">
+                Job application
+            </option>
+
+            <option value="thankyou">
+                Thank you
+            </option>
+
+            <option value="custom">
+                Custom request
+            </option>
+
+        </select>
+
+
+        <label>What should the email say?</label>
+
+        <textarea
+            id="instruction"
+            placeholder="Example: Ask John for a meeting next Monday to discuss the project."
+        ></textarea>
+
+
+        <div class="row">
+
+            <div>
+
+                <label>Tone</label>
+
+                <select id="tone">
+
+                    <option>Professional</option>
+                    <option>Friendly</option>
+                    <option>Formal</option>
+                    <option>Short & Direct</option>
+
+                </select>
+
+            </div>
+
+            <div>
+
+                <label>Priority</label>
+
+                <select id="priority">
+
+                    <option>Normal</option>
+                    <option>High</option>
+                    <option>Urgent</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                class="primary"
+                onclick="runAgent()"
+            >
+                🤖 Run Email Agent
+            </button>
+
+            <button
+                class="secondary"
+                onclick="clearAll()"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- EMAIL PREVIEW -->
+
+    <div class="card" style="margin-top:20px;">
+
+        <div class="card-title">
+
+            <h2>📨 Email Preview</h2>
+
+            <span
+                class="badge"
+                id="previewStatus"
+            >
+                DRAFT
+            </span>
+
+        </div>
+
+
+        <div class="preview">
+
+            <div class="preview-header">
+
+                <div>
+                    <b>To:</b>
+                    <span id="previewTo">—</span>
+                </div>
+
+                <div>
+                    <b>Subject:</b>
+                    <span id="previewSubject">—</span>
+                </div>
+
+            </div>
+
+
+            <div
+                class="preview-body"
+                id="previewBody"
+            >
+                Your generated email will appear here.
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <div class="buttons">
+
+            <button
+                class="success"
+                onclick="sendEmail()"
+            >
+                ✓ Approve & Send
+            </button>
+
+            <button
+                class="secondary"
+                onclick="regenerate()"
+            >
+                ↻ Regenerate
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =================================================
+     RIGHT SIDE
+================================================= -->
+
+<div>
+
+    <!-- AGENT -->
+
+    <div class="agent-box">
+
+        <div class="agent-header">
+
+            <div class="agent-avatar">
+                🤖
+            </div>
+
+            <div>
+
+                <h3>MailPilot Agent</h3>
+
+                <p>
+                    Autonomous email workflow
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div
+                class="step"
+                id="step1"
+            >
+                <div class="step-icon">1</div>
+                Understand request
+            </div>
+
+            <div
+                class="step"
+                id="step2"
+            >
+                <div class="step-icon">2</div>
+                Plan email
+            </div>
+
+            <div
+                class="step"
+                id="step3"
+            >
+                <div class="step-icon">3</div>
+                Generate draft
+            </div>
+
+            <div
+                class="step"
+                id="step4"
+            >
+                <div class="step-icon">4</div>
+                Analyze tone
+            </div>
+
+            <div
+                class="step"
+                id="step5"
+            >
+                <div class="step-icon">5</div>
+                Validate recipient
+            </div>
+
+            <div
+                class="step"
+                id="step6"
+            >
+                <div class="step-icon">6</div>
+                Await approval
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ANALYSIS -->
+
+    <div class="card analysis">
+
+        <div class="card-title">
+
+            <h2>🧠 AI Analysis</h2>
+
+            <span class="badge">
+                LIVE
+            </span>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <span>Intent</span>
+
+            <b id="analysisIntent">
+                Not analyzed
+            </b>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <span>Tone</span>
+
+            <b id="analysisTone">
+                —
+            </b>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <span>Priority</span>
+
+            <b id="analysisPriority">
+                —
+            </b>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <span>Recipient</span>
+
+            <b id="analysisRecipient">
+                —
+            </b>
+
+        </div>
+
+
+        <div class="score">
+
+            <div
+                class="score-number"
+                id="score"
+            >
+                0%
+            </div>
+
+            <p>
+                Agent confidence
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVITY -->
+
+    <div class="card activity">
+
+        <div class="card-title">
+
+            <h2>⚡ Agent Activity</h2>
+
+        </div>
+
+        <div
+            class="log"
+            id="activityLog"
+        >
+
+            <div class="log-item">
+                <span class="log-time">
+                    Now
+                </span>
+                Agent ready
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+>
+    Email sent successfully!
+</div>
+
+
+<script>
+
+/* =================================================
+   GLOBAL STATE
+================================================= */
+
+let generatedEmail = {
+    subject: "",
+    body: ""
+};
+
+let agentRunning = false;
+
+
+/* =================================================
+   LOG
+================================================= */
+
+function log(message) {
+
+    const logBox =
+        document.getElementById("activityLog");
+
+    const item =
+        document.createElement("div");
+
+    item.className = "log-item";
+
+    const time =
+        new Date().toLocaleTimeString();
+
+    item.innerHTML = `
+        <span class="log-time">
+            ${time}
+        </span>
+        ${message}
+    `;
+
+    logBox.prepend(item);
+}
+
+
+/* =================================================
+   STEP HANDLER
+================================================= */
+
+function setStep(number, state) {
+
+    const step =
+        document.getElementById(
+            "step" + number
+        );
+
+    step.classList.remove(
+        "active",
+        "complete"
+    );
+
+    if (state === "active") {
+
+        step.classList.add("active");
+
+    }
+
+    if (state === "complete") {
+
+        step.classList.add("complete");
+
+        step.querySelector(
+            ".step-icon"
+        ).textContent = "✓";
+
+    }
+
+}
+
+
+/* =================================================
+   GET INTENT
+================================================= */
+
+function getIntent() {
+
+    const purpose =
+        document.getElementById("purpose")
+        .value;
+
+    const map = {
+
+        meeting: "Meeting request",
+
+        followup: "Follow-up",
+
+        leave: "Leave request",
+
+        job: "Job application",
+
+        thankyou: "Thank-you message",
+
+        custom: "Custom request"
+
+    };
+
+    return map[purpose];
+
+}
+
+
+/* =================================================
+   GENERATE EMAIL
+================================================= */
+
+function generateEmail() {
+
+    const name =
+        document.getElementById(
+            "recipientName"
+        ).value.trim()
+        || "there";
+
+    const instruction =
+        document.getElementById(
+            "instruction"
+        ).value.trim();
+
+    const tone =
+        document.getElementById("tone")
+        .value;
+
+    const purpose =
+        document.getElementById("purpose")
+        .value;
+
+
+    let subject = "";
+    let body = "";
+
+
+    /* SUBJECT */
+
+    if (purpose === "meeting") {
+
+        subject =
+            "Request for a Meeting";
+
+    }
+
+    else if (purpose === "followup") {
+
+        subject =
+            "Following Up";
+
+    }
+
+    else if (purpose === "leave") {
+
+        subject =
+            "Leave Request";
+
+    }
+
+    else if (purpose === "job") {
+
+        subject =
+            "Job Application";
+
+    }
+
+    else if (purpose === "thankyou") {
+
+        subject =
+            "Thank You";
+
+    }
+
+    else {
+
+        subject =
+            "Regarding Your Request";
+
+    }
+
+
+    /* BODY */
+
+    if (purpose === "meeting") {
+
+        body =
+`Dear ${name},
+
+I hope you are doing well.
+
+I would like to request a meeting to discuss the matter mentioned below.
+
+${instruction || "I would appreciate the opportunity to discuss this with you."}
+
+Please let me know a convenient time for you.
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    else if (purpose === "followup") {
+
+        body =
+`Dear ${name},
+
+I hope you are doing well.
+
+I am writing to follow up regarding the matter below:
+
+${instruction || "I wanted to check if there are any updates."}
+
+Please let me know when you have an update.
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    else if (purpose === "leave") {
+
+        body =
+`Dear ${name},
+
+I would like to request leave.
+
+${instruction || "Please let me know if you need any additional information from me."}
+
+I would appreciate your approval.
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    else if (purpose === "job") {
+
+        body =
+`Dear ${name},
+
+I am writing to express my interest in the opportunity.
+
+${instruction || "I would be grateful for the opportunity to discuss my qualifications and how I could contribute to your organization."}
+
+Thank you for your time and consideration.
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    else if (purpose === "thankyou") {
+
+        body =
+`Dear ${name},
+
+Thank you for your time and support.
+
+${instruction || "I sincerely appreciate your help and assistance."}
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    else {
+
+        body =
+`Dear ${name},
+
+I hope you are doing well.
+
+${instruction || "I am writing regarding the matter we discussed."}
+
+Please let me know if you have any questions.
+
+Best regards,
+Your Name`;
+
+    }
+
+
+    /* TONE ADJUSTMENT */
+
+    if (tone === "Friendly") {
+
+        body =
+            body.replace(
+                "Dear",
+                "Hi"
+            );
+
+    }
+
+    if (tone === "Short & Direct") {
+
+        body =
+`Hi ${name},
+
+${instruction || "I wanted to follow up regarding this matter."}
+
+Please let me know.
+
+Thanks,
+Your Name`;
+
+    }
+
+
+    generatedEmail.subject =
+        subject;
+
+    generatedEmail.body =
+        body;
+
+
+    document.getElementById(
+        "previewTo"
+    ).textContent =
+        document.getElementById(
+            "recipient"
+        ).value || "Not provided";
+
+
+    document.getElementById(
+        "previewSubject"
+    ).textContent =
+        subject;
+
+
+    document.getElementById(
+        "previewBody"
+    ).textContent =
+        body;
+
+}
+
+
+/* =================================================
+   RUN AGENT
+================================================= */
+
+async function runAgent() {
+
+    const recipient =
+        document.getElementById(
+            "recipient"
+        ).value.trim();
+
+
+    if (!recipient) {
+
+        alert(
+            "Please enter a recipient email."
+        );
+
+        return;
+
+    }
+
+
+    agentRunning = true;
+
+
+    /* RESET STEPS */
+
+    for (let i = 1; i <= 6; i++) {
+
+        const step =
+            document.getElementById(
+                "step" + i
+            );
+
+        step.classList.remove(
+            "active",
+            "complete"
+        );
+
+    }
+
+
+    /* STEP 1 */
+
+    setStep(1,"active");
+
+    log("Agent is understanding the request...");
+
+    await wait(600);
+
+    setStep(1,"complete");
+
+
+    /* STEP 2 */
+
+    setStep(2,"active");
+
+    log("Agent is planning the email...");
+
+    await wait(600);
+
+    setStep(2,"complete");
+
+
+    /* STEP 3 */
+
+    setStep(3,"active");
+
+    log("AI is generating the email draft...");
+
+    await wait(700);
+
+    generateEmail();
+
+    setStep(3,"complete");
+
+
+    /* STEP 4 */
+
+    setStep(4,"active");
+
+    log("Analyzing tone and writing quality...");
+
+    await wait(600);
+
+    setStep(4,"complete");
+
+
+    /* STEP 5 */
+
+    setStep(5,"active");
+
+    log("Validating recipient address...");
+
+    await wait(600);
+
+    const valid =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        .test(recipient);
+
+
+    if (!valid) {
+
+        alert(
+            "The email address appears invalid."
+        );
+
+        setStep(5,"active");
+
+        return;
+
+    }
+
+
+    setStep(5,"complete");
+
+
+    /* ANALYSIS */
+
+    document.getElementById(
+        "analysisIntent"
+    ).textContent =
+        getIntent();
+
+
+    document.getElementById(
+        "analysisTone"
+    ).textContent =
+        document.getElementById(
+            "tone"
+        ).value;
+
+
+    document.getElementById(
+        "analysisPriority"
+    ).textContent =
+        document.getElementById(
+            "priority"
+        ).value;
+
+
+    document.getElementById(
+        "analysisRecipient"
+    ).textContent =
+        "Valid";
+
+
+    document.getElementById(
+        "score"
+    ).textContent =
+        "96%";
+
+
+    /* APPROVAL */
+
+    setStep(6,"active");
+
+    log(
+        "Draft ready. Waiting for human approval."
+    );
+
+
+    document.getElementById(
+        "previewStatus"
+    ).textContent =
+        "AWAITING APPROVAL";
+
+
+    agentRunning = false;
+
+}
+
+
+/* =================================================
+   SEND EMAIL
+================================================= */
+
+function sendEmail() {
+
+    if (
+        !generatedEmail.body
+    ) {
+
+        alert(
+            "Run the email agent first."
+        );
+
+        return;
+
+    }
+
+
+    const recipient =
+        document.getElementById(
+            "recipient"
+        ).value;
+
+
+    /*
+       FRONTEND DEMO ONLY
+
+       In a real application, this function
+       would call your backend:
+
+       fetch("/api/send-email", {
+           method: "POST",
+           body: JSON.stringify(...)
+       });
+
+       The backend would then use an
+       email provider/API.
+    */
+
+
+    log(
+        "Human approval received."
+    );
+
+    log(
+        "Email sent to " +
+        recipient
+    );
+
+
+    setStep(6,"complete");
+
+
+    document.getElementById(
+        "previewStatus"
+    ).textContent =
+        "SENT";
+
+
+    showToast(
+        "✓ Email sent successfully!"
+    );
+
+}
+
+
+/* =================================================
+   REGENERATE
+================================================= */
+
+function regenerate() {
+
+    if (!document.getElementById(
+        "recipient"
+    ).value) {
+
+        alert(
+            "Enter a recipient first."
+        );
+
+        return;
+
+    }
+
+
+    log(
+        "Agent is regenerating the draft..."
+    );
+
+
+    generateEmail();
+
+
+    document.getElementById(
+        "previewStatus"
+    ).textContent =
+        "NEW DRAFT";
+
+
+    document.getElementById(
+        "score"
+    ).textContent =
+        "98%";
+
+}
+
+
+/* =================================================
+   CLEAR
+================================================= */
+
+function clearAll() {
+
+    document.getElementById(
+        "recipient"
+    ).value = "";
+
+    document.getElementById(
+        "recipientName"
+    ).value = "";
+
+    document.getElementById(
+        "instruction"
+    ).value = "";
+
+
+    generatedEmail = {
+        subject:"",
+        body:""
+    };
+
+
+    document.getElementById(
+        "previewTo"
+    ).textContent = "—";
+
+
+    document.getElementById(
+        "previewSubject"
+    ).textContent = "—";
+
+
+    document.getElementById(
+        "previewBody"
+    ).textContent =
+        "Your generated email will appear here.";
+
+
+    document.getElementById(
+        "previewStatus"
+    ).textContent =
+        "DRAFT";
+
+
+    document.getElementById(
+        "score"
+    ).textContent =
+        "0%";
+
+
+    log(
+        "Workspace cleared."
+    );
+
+}
+
+
+/* =================================================
+   TOAST
+================================================= */
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent =
+        message;
+
+    toast.style.display =
+        "block";
+
+
+    setTimeout(() => {
+
+        toast.style.display =
+            "none";
+
+    },3000);
+
+}
+
+
+/* =================================================
+   WAIT
+================================================= */
+
+function wait(ms) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+</script>
+
+</body>
+</html>
+```
