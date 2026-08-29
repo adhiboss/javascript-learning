@@ -1,0 +1,1262 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Analytics Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+/* HEADER */
+
+header {
+    background: #111827;
+    color: white;
+    padding: 25px 40px;
+}
+
+header h1 {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+header p {
+    color: #cbd5e1;
+}
+
+/* MAIN */
+
+.container {
+    width: 94%;
+    max-width: 1400px;
+    margin: 25px auto;
+}
+
+/* FILTER BAR */
+
+.filter-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.07);
+    margin-bottom: 20px;
+}
+
+.filter-box h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filters input,
+.filters select,
+.filters button {
+    padding: 11px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+}
+
+.filters input {
+    min-width: 230px;
+}
+
+.filters button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.filters button:hover {
+    background: #1d4ed8;
+}
+
+/* KPI */
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.kpi {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.07);
+}
+
+.kpi small {
+    color: #64748b;
+}
+
+.kpi h2 {
+    margin-top: 10px;
+    font-size: 25px;
+}
+
+/* CHART GRID */
+
+.charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.07);
+}
+
+.card h2 {
+    font-size: 19px;
+    margin-bottom: 15px;
+}
+
+canvas {
+    width: 100%;
+    height: 300px;
+}
+
+/* TABLE */
+
+.table-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.07);
+}
+
+.table-card h2 {
+    margin-bottom: 15px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+.badge {
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.excellent {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.good {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.average {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.low {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px) {
+    .kpis {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media(max-width:800px) {
+    .charts {
+        grid-template-columns: 1fr;
+    }
+
+    .kpis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:500px) {
+    .kpis {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>👨‍💼 Employee Performance Analytics</h1>
+    <p>Interactive HR data analysis dashboard</p>
+</header>
+
+<div class="container">
+
+    <!-- FILTERS -->
+
+    <div class="filter-box">
+
+        <h2>🔎 Filter Employees</h2>
+
+        <div class="filters">
+
+            <input
+                type="text"
+                id="search"
+                placeholder="Search employee..."
+                oninput="updateDashboard()"
+            >
+
+            <select
+                id="department"
+                onchange="updateDashboard()"
+            >
+                <option value="All">All Departments</option>
+                <option value="IT">IT</option>
+                <option value="HR">HR</option>
+                <option value="Sales">Sales</option>
+                <option value="Finance">Finance</option>
+                <option value="Marketing">Marketing</option>
+            </select>
+
+            <select
+                id="performance"
+                onchange="updateDashboard()"
+            >
+                <option value="All">All Performance</option>
+                <option value="Excellent">Excellent</option>
+                <option value="Good">Good</option>
+                <option value="Average">Average</option>
+                <option value="Low">Low</option>
+            </select>
+
+            <button onclick="resetFilters()">
+                Reset
+            </button>
+
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+
+    <div class="kpis">
+
+        <div class="kpi">
+            <small>Total Employees</small>
+            <h2 id="employees">0</h2>
+        </div>
+
+        <div class="kpi">
+            <small>Average Salary</small>
+            <h2 id="salary">₹0</h2>
+        </div>
+
+        <div class="kpi">
+            <small>Average Attendance</small>
+            <h2 id="attendance">0%</h2>
+        </div>
+
+        <div class="kpi">
+            <small>Average Performance</small>
+            <h2 id="score">0</h2>
+        </div>
+
+        <div class="kpi">
+            <small>Top Performer</small>
+            <h2 id="topEmployee">-</h2>
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+
+    <div class="charts">
+
+        <div class="card">
+            <h2>📊 Performance by Employee</h2>
+            <canvas id="performanceChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h2>💰 Average Salary by Department</h2>
+            <canvas id="salaryChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- PERFORMANCE TABLE -->
+
+    <div class="card" style="margin-bottom:20px;">
+
+        <h2>📈 Performance Distribution</h2>
+
+        <canvas id="distributionChart"></canvas>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div class="table-card">
+
+        <h2>👥 Employee Data</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th onclick="sortData('name')">
+                            Employee ↕
+                        </th>
+
+                        <th>Department</th>
+
+                        <th>Experience</th>
+
+                        <th onclick="sortData('salary')">
+                            Salary ↕
+                        </th>
+
+                        <th onclick="sortData('attendance')">
+                            Attendance ↕
+                        </th>
+
+                        <th onclick="sortData('score')">
+                            Score ↕
+                        </th>
+
+                        <th>Performance</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="tableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    Employee Analytics Project • HTML • CSS • JavaScript
+</footer>
+
+<script>
+
+/* ==========================================
+   EMPLOYEE DATASET
+========================================== */
+
+const employees = [
+
+{
+    name:"Aarav",
+    department:"IT",
+    experience:5,
+    salary:85000,
+    attendance:96,
+    score:92,
+    performance:"Excellent"
+},
+
+{
+    name:"Diya",
+    department:"HR",
+    experience:3,
+    salary:60000,
+    attendance:91,
+    score:84,
+    performance:"Good"
+},
+
+{
+    name:"Rohan",
+    department:"Sales",
+    experience:7,
+    salary:78000,
+    attendance:94,
+    score:89,
+    performance:"Good"
+},
+
+{
+    name:"Ananya",
+    department:"Finance",
+    experience:6,
+    salary:92000,
+    attendance:97,
+    score:95,
+    performance:"Excellent"
+},
+
+{
+    name:"Kabir",
+    department:"Marketing",
+    experience:2,
+    salary:55000,
+    attendance:88,
+    score:72,
+    performance:"Average"
+},
+
+{
+    name:"Ishita",
+    department:"IT",
+    experience:4,
+    salary:76000,
+    attendance:93,
+    score:87,
+    performance:"Good"
+},
+
+{
+    name:"Arjun",
+    department:"Sales",
+    experience:8,
+    salary:88000,
+    attendance:95,
+    score:94,
+    performance:"Excellent"
+},
+
+{
+    name:"Meera",
+    department:"HR",
+    experience:5,
+    salary:68000,
+    attendance:90,
+    score:78,
+    performance:"Average"
+},
+
+{
+    name:"Vivaan",
+    department:"Finance",
+    experience:4,
+    salary:72000,
+    attendance:92,
+    score:81,
+    performance:"Good"
+},
+
+{
+    name:"Sara",
+    department:"Marketing",
+    experience:6,
+    salary:70000,
+    attendance:96,
+    score:91,
+    performance:"Excellent"
+},
+
+{
+    name:"Aditya",
+    department:"IT",
+    experience:1,
+    salary:48000,
+    attendance:85,
+    score:65,
+    performance:"Low"
+},
+
+{
+    name:"Nisha",
+    department:"Sales",
+    experience:3,
+    salary:64000,
+    attendance:89,
+    score:76,
+    performance:"Average"
+},
+
+{
+    name:"Karan",
+    department:"Finance",
+    experience:9,
+    salary:98000,
+    attendance:98,
+    score:97,
+    performance:"Excellent"
+},
+
+{
+    name:"Tanya",
+    department:"Marketing",
+    experience:3,
+    salary:59000,
+    attendance:87,
+    score:70,
+    performance:"Average"
+},
+
+{
+    name:"Rahul",
+    department:"IT",
+    experience:7,
+    salary:90000,
+    attendance:94,
+    score:90,
+    performance:"Excellent"
+}
+
+];
+
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+let filteredEmployees = [...employees];
+
+let sortColumn = "";
+let sortDirection = 1;
+
+
+/* ==========================================
+   UPDATE DASHBOARD
+========================================== */
+
+function updateDashboard() {
+
+    const search =
+        document.getElementById("search")
+        .value
+        .toLowerCase();
+
+    const department =
+        document.getElementById("department")
+        .value;
+
+    const performance =
+        document.getElementById("performance")
+        .value;
+
+
+    filteredEmployees = employees.filter(emp => {
+
+        const searchMatch =
+            emp.name
+            .toLowerCase()
+            .includes(search);
+
+        const departmentMatch =
+            department === "All" ||
+            emp.department === department;
+
+        const performanceMatch =
+            performance === "All" ||
+            emp.performance === performance;
+
+        return (
+            searchMatch &&
+            departmentMatch &&
+            performanceMatch
+        );
+
+    });
+
+
+    updateKPIs();
+
+    renderTable();
+
+    drawPerformanceChart();
+
+    drawSalaryChart();
+
+    drawDistributionChart();
+
+}
+
+
+/* ==========================================
+   KPI CALCULATIONS
+========================================== */
+
+function updateKPIs() {
+
+    const total =
+        filteredEmployees.length;
+
+
+    const totalSalary =
+        filteredEmployees.reduce(
+            (sum, emp) =>
+            sum + emp.salary,
+            0
+        );
+
+
+    const totalAttendance =
+        filteredEmployees.reduce(
+            (sum, emp) =>
+            sum + emp.attendance,
+            0
+        );
+
+
+    const totalScore =
+        filteredEmployees.reduce(
+            (sum, emp) =>
+            sum + emp.score,
+            0
+        );
+
+
+    const avgSalary =
+        total
+        ? totalSalary / total
+        : 0;
+
+
+    const avgAttendance =
+        total
+        ? totalAttendance / total
+        : 0;
+
+
+    const avgScore =
+        total
+        ? totalScore / total
+        : 0;
+
+
+    let top = "-";
+
+    if (total > 0) {
+
+        const topEmployee =
+            [...filteredEmployees]
+            .sort(
+                (a,b) =>
+                b.score - a.score
+            )[0];
+
+        top =
+            topEmployee.name;
+
+    }
+
+
+    document.getElementById("employees")
+        .textContent = total;
+
+
+    document.getElementById("salary")
+        .textContent =
+        money(avgSalary);
+
+
+    document.getElementById("attendance")
+        .textContent =
+        avgAttendance.toFixed(1) + "%";
+
+
+    document.getElementById("score")
+        .textContent =
+        avgScore.toFixed(1);
+
+
+    document.getElementById("topEmployee")
+        .textContent = top;
+
+}
+
+
+/* ==========================================
+   TABLE
+========================================== */
+
+function renderTable() {
+
+    const tbody =
+        document.getElementById("tableBody");
+
+    tbody.innerHTML = "";
+
+
+    filteredEmployees.forEach(emp => {
+
+        const tr =
+            document.createElement("tr");
+
+
+        let badgeClass = "average";
+
+
+        if (emp.performance === "Excellent") {
+            badgeClass = "excellent";
+        }
+
+        else if (emp.performance === "Good") {
+            badgeClass = "good";
+        }
+
+        else if (emp.performance === "Low") {
+            badgeClass = "low";
+        }
+
+
+        tr.innerHTML = `
+
+            <td>${emp.name}</td>
+
+            <td>${emp.department}</td>
+
+            <td>${emp.experience} years</td>
+
+            <td>${money(emp.salary)}</td>
+
+            <td>${emp.attendance}%</td>
+
+            <td>${emp.score}</td>
+
+            <td>
+                <span class="badge ${badgeClass}">
+                    ${emp.performance}
+                </span>
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* ==========================================
+   SORT
+========================================== */
+
+function sortData(column) {
+
+    if (sortColumn === column) {
+
+        sortDirection *= -1;
+
+    } else {
+
+        sortColumn = column;
+        sortDirection = 1;
+
+    }
+
+
+    filteredEmployees.sort(
+        (a,b) => {
+
+            if (
+                typeof a[column] ===
+                "number"
+            ) {
+
+                return (
+                    a[column] -
+                    b[column]
+                ) * sortDirection;
+
+            }
+
+
+            return a[column]
+                .localeCompare(b[column])
+                * sortDirection;
+
+        }
+    );
+
+
+    renderTable();
+
+}
+
+
+/* ==========================================
+   PERFORMANCE BAR CHART
+========================================== */
+
+function drawPerformanceChart() {
+
+    const canvas =
+        document.getElementById(
+            "performanceChart"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    canvas.width =
+        canvas.clientWidth * 2;
+
+    canvas.height = 600;
+
+    ctx.scale(2,2);
+
+
+    const width =
+        canvas.clientWidth;
+
+    const height = 300;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (!filteredEmployees.length)
+        return;
+
+
+    const max = 100;
+
+    const space =
+        width /
+        filteredEmployees.length;
+
+
+    filteredEmployees.forEach(
+        (emp,index) => {
+
+            const barHeight =
+                emp.score / max * 210;
+
+
+            const x =
+                index * space + 8;
+
+
+            const y =
+                250 - barHeight;
+
+
+            ctx.fillRect(
+                x,
+                y,
+                space - 15,
+                barHeight
+            );
+
+
+            ctx.save();
+
+            ctx.translate(
+                x + 10,
+                270
+            );
+
+            ctx.rotate(
+                -Math.PI / 4
+            );
+
+            ctx.font =
+                "11px Arial";
+
+
+            ctx.fillText(
+                emp.name,
+                0,
+                0
+            );
+
+
+            ctx.restore();
+
+        }
+    );
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(30,35);
+
+    ctx.lineTo(30,250);
+
+    ctx.lineTo(width-10,250);
+
+    ctx.stroke();
+
+}
+
+
+/* ==========================================
+   SALARY BY DEPARTMENT
+========================================== */
+
+function drawSalaryChart() {
+
+    const canvas =
+        document.getElementById(
+            "salaryChart"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    canvas.width =
+        canvas.clientWidth * 2;
+
+    canvas.height = 600;
+
+    ctx.scale(2,2);
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height = 300;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const departments = {};
+
+
+    filteredEmployees.forEach(
+        emp => {
+
+            if (!departments[
+                emp.department
+            ]) {
+
+                departments[
+                    emp.department
+                ] = [];
+
+            }
+
+
+            departments[
+                emp.department
+            ].push(emp.salary);
+
+        }
+    );
+
+
+    const names =
+        Object.keys(departments);
+
+
+    if (!names.length)
+        return;
+
+
+    const averages =
+        names.map(name => {
+
+            const arr =
+                departments[name];
+
+            return arr.reduce(
+                (a,b) => a+b,
+                0
+            ) / arr.length;
+
+        });
+
+
+    const max =
+        Math.max(...averages);
+
+
+    const space =
+        width / names.length;
+
+
+    names.forEach(
+        (name,index) => {
+
+            const heightBar =
+                averages[index]
+                / max * 210;
+
+
+            const x =
+                index * space + 15;
+
+
+            const y =
+                250 - heightBar;
+
+
+            ctx.fillRect(
+                x,
+                y,
+                space - 30,
+                heightBar
+            );
+
+
+            ctx.fillText(
+                name,
+                x,
+                270
+            );
+
+        }
+    );
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(30,35);
+
+    ctx.lineTo(30,250);
+
+    ctx.lineTo(width-10,250);
+
+    ctx.stroke();
+
+}
+
+
+/* ==========================================
+   PERFORMANCE DISTRIBUTION
+========================================== */
+
+function drawDistributionChart() {
+
+    const canvas =
+        document.getElementById(
+            "distributionChart"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    canvas.width =
+        canvas.clientWidth * 2;
+
+    canvas.height = 600;
+
+    ctx.scale(2,2);
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height = 300;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const levels = [
+        "Excellent",
+        "Good",
+        "Average",
+        "Low"
+    ];
+
+
+    const counts =
+        levels.map(level =>
+
+            filteredEmployees.filter(
+                emp =>
+                emp.performance === level
+            ).length
+
+        );
+
+
+    const max =
+        Math.max(...counts,1);
+
+
+    const space =
+        width / levels.length;
+
+
+    levels.forEach(
+        (level,index) => {
+
+            const barHeight =
+                counts[index]
+                / max * 210;
+
+
+            const x =
+                index * space + 25;
+
+
+            const y =
+                250 - barHeight;
+
+
+            ctx.fillRect(
+                x,
+                y,
+                space - 50,
+                barHeight
+            );
+
+
+            ctx.fillText(
+                level,
+                x,
+                275
+            );
+
+
+            ctx.fillText(
+                counts[index],
+                x + 20,
+                y - 8
+            );
+
+        }
+    );
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(30,35);
+
+    ctx.lineTo(30,250);
+
+    ctx.lineTo(width-10,250);
+
+    ctx.stroke();
+
+}
+
+
+/* ==========================================
+   RESET
+========================================== */
+
+function resetFilters() {
+
+    document.getElementById("search")
+        .value = "";
+
+    document.getElementById("department")
+        .value = "All";
+
+    document.getElementById("performance")
+        .value = "All";
+
+
+    filteredEmployees =
+        [...employees];
+
+
+    updateDashboard();
+
+}
+
+
+/* ==========================================
+   MONEY FORMAT
+========================================== */
+
+function money(value) {
+
+    return "₹" +
+        Math.round(value)
+        .toLocaleString("en-IN");
+
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+updateDashboard();
+
+</script>
+
+</body>
+</html>
+```
