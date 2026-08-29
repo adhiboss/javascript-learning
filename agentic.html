@@ -1,0 +1,485 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        /* Navbar */
+        nav {
+            background: #111827;
+            color: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav h2 {
+            font-size: 21px;
+        }
+
+        nav span {
+            color: #60a5fa;
+        }
+
+        /* Main */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .hero h1 {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 130px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .generate {
+            background: #2563eb;
+            color: white;
+        }
+
+        .generate:hover {
+            background: #1d4ed8;
+        }
+
+        .send {
+            background: #16a34a;
+            color: white;
+        }
+
+        .send:hover {
+            background: #15803d;
+        }
+
+        /* Preview */
+        .preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .preview p {
+            margin-bottom: 10px;
+        }
+
+        .email-body {
+            margin-top: 20px;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media(max-width:600px) {
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+
+    <nav>
+        <h2>✉️ <span>MailAI</span></h2>
+        <p>AI Email Agent</p>
+    </nav>
+
+
+    <!-- Main -->
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Write Emails with AI</h1>
+            <p>
+                Tell the AI what you want to say and get a professional email instantly.
+            </p>
+        </div>
+
+
+        <!-- Input Card -->
+
+        <div class="card">
+
+            <h2>Create Email</h2>
+
+            <label>Email Address</label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="example@gmail.com"
+            >
+
+
+            <label>Recipient Name</label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="John"
+            >
+
+
+            <label>Email Type</label>
+
+            <select id="type">
+
+                <option value="Meeting Request">
+                    Meeting Request
+                </option>
+
+                <option value="Leave Request">
+                    Leave Request
+                </option>
+
+                <option value="Follow Up">
+                    Follow Up
+                </option>
+
+                <option value="Thank You">
+                    Thank You
+                </option>
+
+                <option value="Job Application">
+                    Job Application
+                </option>
+
+            </select>
+
+
+            <label>What do you want to say?</label>
+
+            <textarea
+                id="message"
+                placeholder="Example: I want to schedule a meeting tomorrow to discuss the project."
+            ></textarea>
+
+
+            <button
+                class="generate"
+                onclick="generateEmail()"
+            >
+                ✨ Generate Email
+            </button>
+
+        </div>
+
+
+        <!-- Preview Card -->
+
+        <div
+            class="card hidden"
+            id="previewCard"
+        >
+
+            <h2>Email Preview</h2>
+
+            <div class="preview">
+
+                <p>
+                    <strong>To:</strong>
+                    <span id="previewEmail"></span>
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    <span id="subject"></span>
+                </p>
+
+                <div
+                    class="email-body"
+                    id="emailBody"
+                ></div>
+
+            </div>
+
+            <br>
+
+            <button
+                class="send"
+                onclick="sendEmail()"
+            >
+                📤 Send Email
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+        © 2026 MailAI • Simple AI Email Agent
+    </footer>
+
+
+    <script>
+
+        function generateEmail() {
+
+            const email =
+                document.getElementById("email").value;
+
+            const name =
+                document.getElementById("name").value
+                || "there";
+
+            const type =
+                document.getElementById("type").value;
+
+            const message =
+                document.getElementById("message").value;
+
+
+            if (!email || !message) {
+
+                alert(
+                    "Please enter an email address and message."
+                );
+
+                return;
+            }
+
+
+            let subject = type;
+
+            let body = "";
+
+
+            if (type === "Meeting Request") {
+
+                subject = "Request for a Meeting";
+
+                body =
+`Hi ${name},
+
+I hope you are doing well.
+
+I would like to schedule a meeting with you.
+
+${message}
+
+Please let me know a convenient time.
+
+Best regards,
+Your Name`;
+
+            }
+
+
+            else if (type === "Leave Request") {
+
+                subject = "Leave Request";
+
+                body =
+`Hi ${name},
+
+I would like to request leave.
+
+${message}
+
+Please let me know if you need any additional information.
+
+Thank you.
+
+Best regards,
+Your Name`;
+
+            }
+
+
+            else if (type === "Follow Up") {
+
+                subject = "Following Up";
+
+                body =
+`Hi ${name},
+
+I hope you are doing well.
+
+I wanted to follow up regarding the following matter:
+
+${message}
+
+Please let me know if there are any updates.
+
+Best regards,
+Your Name`;
+
+            }
+
+
+            else if (type === "Thank You") {
+
+                subject = "Thank You";
+
+                body =
+`Hi ${name},
+
+Thank you very much for your help.
+
+${message}
+
+I really appreciate your time and support.
+
+Best regards,
+Your Name`;
+
+            }
+
+
+            else if (type === "Job Application") {
+
+                subject = "Job Application";
+
+                body =
+`Dear ${name},
+
+I am writing to express my interest in the position.
+
+${message}
+
+I would appreciate the opportunity to discuss my qualifications with you.
+
+Thank you for your consideration.
+
+Best regards,
+Your Name`;
+
+            }
+
+
+            document.getElementById(
+                "previewEmail"
+            ).textContent = email;
+
+
+            document.getElementById(
+                "subject"
+            ).textContent = subject;
+
+
+            document.getElementById(
+                "emailBody"
+            ).textContent = body;
+
+
+            document.getElementById(
+                "previewCard"
+            ).classList.remove("hidden");
+
+        }
+
+
+        function sendEmail() {
+
+            const email =
+                document.getElementById("email").value;
+
+
+            /*
+                Demo only.
+
+                For real email sending,
+                connect this function to
+                a backend/email API.
+            */
+
+            alert(
+                "Email sent successfully to " + email
+            );
+
+        }
+
+    </script>
+
+</body>
+</html>
+```
