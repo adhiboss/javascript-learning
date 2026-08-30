@@ -1,0 +1,691 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEURAL//VOID</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;
+  background:#020205;color:#00ff9d;
+  font-family:Consolas,monospace;
+}
+canvas{position:fixed;inset:0;z-index:0}
+
+#app{
+  position:relative;z-index:2;width:100%;height:100%;
+  display:grid;grid-template-columns:250px 1fr;
+  backdrop-filter:blur(1px);
+}
+
+aside{
+  border-right:1px solid #00ff9d44;
+  background:#020208cc;
+  padding:20px;
+  box-shadow:10px 0 50px #00ff9d08;
+}
+
+.logo{
+  font-size:25px;font-weight:bold;
+  letter-spacing:4px;margin-bottom:35px;
+  text-shadow:0 0 15px #00ff9d;
+}
+
+.logo span{color:#ff00d4}
+
+button{
+  width:100%;margin:6px 0;padding:11px;
+  background:#00ff9d0a;color:#00ff9d;
+  border:1px solid #00ff9d44;
+  font-family:inherit;cursor:pointer;
+  transition:.2s;
+}
+button:hover{
+  background:#00ff9d22;
+  border-color:#00ff9d;
+  box-shadow:0 0 20px #00ff9d22;
+}
+
+main{padding:18px;overflow:auto}
+
+.top{
+  display:flex;justify-content:space-between;
+  align-items:center;border-bottom:1px solid #00ff9d33;
+  padding-bottom:12px;margin-bottom:15px;
+}
+
+.status{
+  font-size:12px;
+  color:#8affcf;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:12px;
+}
+
+.card{
+  background:#03050bcc;
+  border:1px solid #00ff9d30;
+  padding:15px;
+  box-shadow:0 0 30px #00ff9d08;
+  position:relative;
+  overflow:hidden;
+}
+
+.card:before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent,#00ff9d05,transparent);
+  animation:scan 4s linear infinite;
+}
+
+@keyframes scan{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(100%)}
+}
+
+.big{grid-column:span 8}
+.small{grid-column:span 4}
+.full{grid-column:1/-1}
+
+h3{
+  margin:0 0 12px;
+  font-size:12px;
+  letter-spacing:2px;
+  color:#78ffc9;
+}
+
+.metric{
+  font-size:38px;
+  font-weight:bold;
+  text-shadow:0 0 15px currentColor;
+}
+
+.green{color:#00ff9d}
+.pink{color:#ff00d4}
+.blue{color:#00d9ff}
+
+.bar{
+  height:7px;background:#ffffff0a;
+  margin-top:10px;
+}
+.bar i{
+  display:block;height:100%;
+  background:#00ff9d;
+  box-shadow:0 0 12px #00ff9d;
+}
+
+#terminal{
+  height:300px;
+  overflow:auto;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.line{white-space:pre-wrap}
+.err{color:#ff3864}
+.info{color:#00d9ff}
+
+.input{
+  display:flex;border-top:1px solid #00ff9d33;
+  padding-top:10px;
+}
+.input span{margin-right:8px}
+input{
+  flex:1;background:none;border:0;
+  outline:0;color:#fff;font:inherit;
+}
+
+#game{
+  height:250px;position:relative;
+  background:#0008;overflow:hidden;
+  border:1px solid #ff00d444;
+}
+.enemy{
+  position:absolute;width:18px;height:18px;
+  border:2px solid #ff00d4;
+  box-shadow:0 0 20px #ff00d4;
+  transform:rotate(45deg);
+}
+#crosshair{
+  position:absolute;width:30px;height:30px;
+  border:1px solid #00ff9d;
+  border-radius:50%;pointer-events:none;
+  box-shadow:0 0 15px #00ff9d;
+}
+
+.logs{
+  height:150px;overflow:hidden;font-size:11px;
+  color:#6affbf;
+}
+
+@media(max-width:800px){
+  #app{grid-template-columns:1fr}
+  aside{display:none}
+  .big,.small{grid-column:1/-1}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="app">
+
+<aside>
+  <div class="logo">NEURAL<span>//</span>VOID</div>
+
+  <button onclick="run('scan')">NETWORK SCAN</button>
+  <button onclick="run('hack')">BREACH SIMULATOR</button>
+  <button onclick="run('decrypt')">DECRYPT CORE</button>
+  <button onclick="run('ghost')">GHOST MODE</button>
+  <button onclick="run('chaos')">CHAOS MODE</button>
+  <button onclick="run('clear')">CLEAR TERMINAL</button>
+  <button onclick="toggleSound()">SOUND: <b id="sound">OFF</b></button>
+
+  <br><br>
+
+  <div class="status">
+    NODE: VOID-7<br>
+    ENCRYPTION: QUANTUM<br>
+    FIREWALL: ACTIVE<br>
+    THREAT: <span id="threat">UNKNOWN</span>
+  </div>
+</aside>
+
+<main>
+
+  <div class="top">
+    <div>
+      <b>NEURAL//VOID CONTROL CENTER</b>
+    </div>
+    <div class="status" id="clock"></div>
+  </div>
+
+  <div class="grid">
+
+    <section class="card small">
+      <h3>CPU LOAD</h3>
+      <div class="metric green" id="cpu">42%</div>
+      <div class="bar"><i id="cpuBar" style="width:42%"></i></div>
+    </section>
+
+    <section class="card small">
+      <h3>NEURAL ACTIVITY</h3>
+      <div class="metric pink" id="neural">87%</div>
+      <div class="bar"><i id="neuralBar" style="width:87%;background:#ff00d4"></i></div>
+    </section>
+
+    <section class="card small">
+      <h3>VOID ENERGY</h3>
+      <div class="metric blue" id="energy">∞</div>
+      <div class="bar"><i style="width:100%;background:#00d9ff"></i></div>
+    </section>
+
+    <section class="card big">
+      <h3>QUANTUM TERMINAL</h3>
+
+      <div id="terminal">
+        <div class="line info">NEURAL//VOID boot sequence initiated...</div>
+        <div class="line">Loading quantum modules ████████████ 100%</div>
+        <div class="line">Reality engine: ONLINE</div>
+        <div class="line">Human interface: ACCEPTED</div>
+        <div class="line">Type "help" for available commands.</div>
+      </div>
+
+      <div class="input">
+        <span>root@void:~$</span>
+        <input id="cmd" autocomplete="off" autofocus>
+      </div>
+    </section>
+
+    <section class="card small">
+      <h3>LIVE EVENT STREAM</h3>
+      <div class="logs" id="logs"></div>
+    </section>
+
+    <section class="card full">
+      <h3>VOID DEFENSE // CLICK THE ENTITIES</h3>
+      <div id="game">
+        <div id="crosshair"></div>
+      </div>
+      <div style="margin-top:8px;font-size:12px">
+        SCORE: <b id="score">0</b>
+        &nbsp; | &nbsp;
+        TARGETS: <b id="targets">0</b>
+      </div>
+    </section>
+
+  </div>
+</main>
+</div>
+
+<script>
+
+/* =========================
+   MATRIX RAIN
+========================= */
+
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+let W,H;
+let drops=[];
+
+function resize(){
+  W=canvas.width=innerWidth;
+  H=canvas.height=innerHeight;
+  drops=Array(Math.floor(W/16)).fill(1);
+}
+resize();
+addEventListener("resize",resize);
+
+function matrix(){
+  ctx.fillStyle="rgba(0,0,0,.08)";
+  ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle="#00ff9d";
+  ctx.font="14px monospace";
+
+  drops.forEach((y,i)=>{
+    const text="01アイNEURALVOID"[Math.floor(Math.random()*15)];
+    ctx.fillText(text,i*16,y*16);
+
+    if(y*16>H && Math.random()>.975) drops[i]=0;
+    drops[i]++;
+  });
+
+  requestAnimationFrame(matrix);
+}
+matrix();
+
+
+/* =========================
+   CLOCK
+========================= */
+
+function clock(){
+  document.getElementById("clock").textContent=
+    new Date().toLocaleTimeString()+" // REALITY ONLINE";
+}
+setInterval(clock,1000);
+clock();
+
+
+/* =========================
+   LIVE METRICS
+========================= */
+
+setInterval(()=>{
+  const cpu=Math.floor(20+Math.random()*75);
+  const neural=Math.floor(50+Math.random()*50);
+
+  document.getElementById("cpu").textContent=cpu+"%";
+  document.getElementById("cpuBar").style.width=cpu+"%";
+
+  document.getElementById("neural").textContent=neural+"%";
+  document.getElementById("neuralBar").style.width=neural+"%";
+},900);
+
+
+/* =========================
+   TERMINAL
+========================= */
+
+const terminal=document.getElementById("terminal");
+const input=document.getElementById("cmd");
+
+function print(text,type=""){
+  const d=document.createElement("div");
+  d.className="line "+type;
+  d.textContent=text;
+  terminal.appendChild(d);
+  terminal.scrollTop=terminal.scrollHeight;
+}
+
+function execute(command){
+
+  command=command.trim().toLowerCase();
+
+  if(!command)return;
+
+  print("root@void:~$ "+command);
+
+  if(command==="help"){
+    print(`
+AVAILABLE COMMANDS
+
+help       show commands
+scan       scan network
+hack       breach simulator
+decrypt    decrypt core
+ghost      enable ghost mode
+chaos      unleash chaos
+whoami     identify operator
+matrix     overload reality
+clear      clear terminal
+reboot     reboot system
+`);
+  }
+
+  else if(command==="whoami"){
+    print("You are the anomaly.");
+  }
+
+  else if(command==="scan"){
+    run("scan");
+  }
+
+  else if(command==="hack"){
+    run("hack");
+  }
+
+  else if(command==="decrypt"){
+    run("decrypt");
+  }
+
+  else if(command==="ghost"){
+    run("ghost");
+  }
+
+  else if(command==="chaos"){
+    run("chaos");
+  }
+
+  else if(command==="matrix"){
+    for(let i=0;i<30;i++)
+      setTimeout(()=>print(
+        "REALITY_BUFFER_"+Math.random().toString(36).slice(2)
+        +" :: "+Math.random().toString(16).slice(2)
+      ),i*50);
+  }
+
+  else if(command==="clear"){
+    terminal.innerHTML="";
+  }
+
+  else if(command==="reboot"){
+    print("REBOOTING...");
+    setTimeout(()=>location.reload(),1200);
+  }
+
+  else{
+    print("Command not found. Reality disagrees.","err");
+  }
+}
+
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    execute(input.value);
+    input.value="";
+  }
+});
+
+
+/* =========================
+   CRAZY COMMANDS
+========================= */
+
+function run(type){
+
+  if(type==="clear"){
+    terminal.innerHTML="";
+    return;
+  }
+
+  if(type==="scan"){
+    print("Scanning dimensional network...","info");
+
+    let hosts=[
+      "192.168.0.13",
+      "10.0.7.44",
+      "VOID://UNKNOWN",
+      "NEURAL://CORE",
+      "127.0.0.1"
+    ];
+
+    hosts.forEach((h,i)=>{
+      setTimeout(()=>{
+        print(
+          "[+] "+h+
+          " :: PORTS "+
+          Math.floor(100+Math.random()*900)+
+          " :: "+(Math.random()>.5?"OPEN":"FILTERED")
+        );
+      },i*350);
+    });
+  }
+
+  if(type==="hack"){
+    print("Initializing simulated breach...","info");
+
+    let p=0;
+
+    const timer=setInterval(()=>{
+      p+=Math.floor(Math.random()*15)+5;
+
+      if(p>=100){
+        p=100;
+        clearInterval(timer);
+        print("ACCESS GRANTED // SIMULATION COMPLETE");
+        document.getElementById("threat").textContent="MAXIMUM";
+      }
+
+      print("Bypassing firewall ["+"█".repeat(p/5)+"] "+p+"%");
+    },180);
+  }
+
+  if(type==="decrypt"){
+    print("Decrypting quantum core...");
+
+    const secret=[
+      "THE",
+      "VOID",
+      "IS",
+      "LOOKING",
+      "BACK"
+    ];
+
+    secret.forEach((x,i)=>{
+      setTimeout(()=>{
+        print("KEY "+(i+1)+" >> "+x);
+      },i*500);
+    });
+
+    setTimeout(()=>{
+      print("MESSAGE DECRYPTED: YOU WERE NEVER ALONE.","info");
+    },2800);
+  }
+
+  if(type==="ghost"){
+    document.body.style.filter=
+      document.body.style.filter?
+      "":
+      "hue-rotate(120deg) contrast(1.3)";
+    print("GHOST MODE TOGGLED.");
+  }
+
+  if(type==="chaos"){
+    document.body.animate([
+      {transform:"translate(0,0)"},
+      {transform:"translate(8px,-5px)"},
+      {transform:"translate(-8px,5px)"},
+      {transform:"translate(0,0)"}
+    ],{duration:500,iterations:8});
+
+    for(let i=0;i<100;i++){
+      setTimeout(()=>{
+        spawnEnemy(
+          Math.random()*innerWidth,
+          Math.random()*innerHeight
+        );
+      },i*20);
+    }
+
+    print("CHAOS PROTOCOL ACTIVATED.","err");
+  }
+}
+
+
+/* =========================
+   EVENT STREAM
+========================= */
+
+const events=[
+  "Quantum packet intercepted",
+  "Unknown node connected",
+  "Firewall regenerated",
+  "Neural pulse detected",
+  "Ghost process spawned",
+  "Reality checksum changed",
+  "Encrypted signal received",
+  "Observer detected"
+];
+
+setInterval(()=>{
+  const d=document.createElement("div");
+  d.textContent=
+    "["+new Date().toLocaleTimeString()+"] "+
+    events[Math.floor(Math.random()*events.length)];
+
+  document.getElementById("logs").prepend(d);
+
+  if(document.getElementById("logs").children.length>12)
+    document.getElementById("logs").lastChild.remove();
+},700);
+
+
+/* =========================
+   MINI GAME
+========================= */
+
+const game=document.getElementById("game");
+const cross=document.getElementById("crosshair");
+
+let score=0;
+let targetCount=0;
+
+game.addEventListener("mousemove",e=>{
+  const r=game.getBoundingClientRect();
+
+  cross.style.left=(e.clientX-r.left-15)+"px";
+  cross.style.top=(e.clientY-r.top-15)+"px";
+});
+
+function spawnEnemy(x,y){
+
+  const e=document.createElement("div");
+  e.className="enemy";
+
+  const r=game.getBoundingClientRect();
+
+  e.style.left=Math.max(0,Math.min(r.width-20,x-r.left))+"px";
+  e.style.top=Math.max(0,Math.min(r.height-20,y-r.top))+"px";
+
+  game.appendChild(e);
+
+  targetCount++;
+  document.getElementById("targets").textContent=targetCount;
+
+  const life=setTimeout(()=>{
+    if(e.parentNode){
+      e.remove();
+      targetCount--;
+      document.getElementById("targets").textContent=targetCount;
+    }
+  },3000);
+
+  e.onclick=ev=>{
+    ev.stopPropagation();
+    clearTimeout(life);
+    e.remove();
+
+    score++;
+    targetCount--;
+
+    document.getElementById("score").textContent=score;
+    document.getElementById("targets").textContent=targetCount;
+
+    beep();
+  };
+}
+
+setInterval(()=>{
+  const r=game.getBoundingClientRect();
+  spawnEnemy(
+    r.left+Math.random()*r.width,
+    r.top+Math.random()*r.height
+  );
+},1200);
+
+
+/* =========================
+   SOUND ENGINE
+========================= */
+
+let sound=false;
+let audio;
+
+function toggleSound(){
+  sound=!sound;
+  document.getElementById("sound").textContent=
+    sound?"ON":"OFF";
+
+  if(sound) beep();
+}
+
+function beep(){
+
+  if(!sound)return;
+
+  audio=audio||new AudioContext();
+
+  const osc=audio.createOscillator();
+  const gain=audio.createGain();
+
+  osc.frequency.value=500+Math.random()*500;
+  gain.gain.value=.025;
+
+  osc.connect(gain);
+  gain.connect(audio.destination);
+
+  osc.start();
+  osc.stop(audio.currentTime+.06);
+}
+
+
+/* =========================
+   RANDOM SYSTEM MESSAGES
+========================= */
+
+setInterval(()=>{
+
+  const messages=[
+    "WATCHER PROCESS ACTIVE",
+    "NOISE IN SECTOR 7",
+    "MEMORY FRAGMENT FOUND",
+    "UNKNOWN SIGNAL",
+    "TIME DRIFT +0.002ms",
+    "AI CORE OBSERVING",
+    "SIMULATION STABLE"
+  ];
+
+  if(Math.random()>.5)
+    print(
+      "[SYSTEM] "+
+      messages[Math.floor(Math.random()*messages.length)]
+    );
+
+},5000);
+
+</script>
+
+</body>
+</html>
+```
