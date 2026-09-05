@@ -1,0 +1,1121 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataClean AI - Data Analyzer</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #cbd5e1;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1400px;
+            margin: 30px auto;
+        }
+
+        .upload-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .upload-box input {
+            margin-top: 15px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .demo-btn {
+            background: #16a34a;
+        }
+
+        .download-btn {
+            background: #7c3aed;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .card .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+            overflow-x: auto;
+        }
+
+        .section h2 {
+            margin-bottom: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        .issues {
+            display: grid;
+            gap: 10px;
+        }
+
+        .issue {
+            background: #fff7ed;
+            border-left: 5px solid #f97316;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #ecfdf5;
+            border-left: 5px solid #22c55e;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .controls {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📊 DataClean AI</h1>
+    <p>Messy Data Cleaner & Analyzer</p>
+</header>
+
+<div class="container">
+
+    <!-- Upload -->
+    <div class="upload-box">
+
+        <h2>Upload Your CSV Dataset</h2>
+
+        <p style="margin-top:10px;color:#64748b;">
+            Upload a messy CSV file and let the application clean and analyze it.
+        </p>
+
+        <input type="file" id="fileInput" accept=".csv">
+
+        <br>
+
+        <button class="demo-btn" onclick="loadDemoData()">
+            Use Demo Messy Data
+        </button>
+
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+
+        <div class="card">
+            <h3>Total Rows</h3>
+            <div class="value" id="totalRows">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Total Columns</h3>
+            <div class="value" id="totalColumns">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Missing Values</h3>
+            <div class="value" id="missingValues">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Duplicates Removed</h3>
+            <div class="value" id="duplicatesRemoved">0</div>
+        </div>
+
+    </div>
+
+    <!-- Data Quality -->
+    <div id="qualitySection" class="section hidden">
+
+        <h2>🔍 Data Quality Report</h2>
+
+        <div id="issues" class="issues"></div>
+
+    </div>
+
+    <!-- Raw Data -->
+    <div id="rawSection" class="section hidden">
+
+        <h2>🗑️ Original Messy Data</h2>
+
+        <div id="rawTable"></div>
+
+    </div>
+
+    <!-- Cleaned Data -->
+    <div id="cleanSection" class="section hidden">
+
+        <h2>✨ Cleaned Data</h2>
+
+        <div class="controls">
+            <button class="download-btn" onclick="downloadCSV()">
+                ⬇ Download Cleaned CSV
+            </button>
+        </div>
+
+        <div id="cleanTable"></div>
+
+    </div>
+
+    <!-- Statistics -->
+    <div id="statsSection" class="section hidden">
+
+        <h2>📈 Statistical Analysis</h2>
+
+        <div id="statistics"></div>
+
+    </div>
+
+    <!-- Charts -->
+    <div id="chartsSection" class="section hidden">
+
+        <h2>📊 Visual Analysis</h2>
+
+        <div class="charts">
+
+            <div>
+                <h3>Category Distribution</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <div>
+                <h3>Numeric Average</h3>
+                <canvas id="numericChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    let rawData = [];
+    let cleanedData = [];
+
+    /*
+        ------------------------------------------------
+        CSV PARSER
+        ------------------------------------------------
+    */
+
+    function parseCSV(text) {
+
+        const lines = text
+            .trim()
+            .split(/\r?\n/);
+
+        if (lines.length < 2) {
+            return [];
+        }
+
+        const headers = lines[0]
+            .split(",")
+            .map(h => h.trim());
+
+        const data = [];
+
+        for (let i = 1; i < lines.length; i++) {
+
+            const values = lines[i].split(",");
+
+            const row = {};
+
+            headers.forEach((header, index) => {
+
+                row[header] =
+                    values[index] !== undefined
+                        ? values[index].trim()
+                        : "";
+
+            });
+
+            data.push(row);
+        }
+
+        return data;
+    }
+
+
+    /*
+        ------------------------------------------------
+        FILE UPLOAD
+        ------------------------------------------------
+    */
+
+    document
+        .getElementById("fileInput")
+        .addEventListener("change", function(event) {
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                rawData = parseCSV(e.target.result);
+
+                analyzeData();
+
+            };
+
+            reader.readAsText(file);
+
+        });
+
+
+    /*
+        ------------------------------------------------
+        DEMO DATA
+        ------------------------------------------------
+    */
+
+    function loadDemoData() {
+
+        const messyCSV = `
+Name,Age,Gender,City,Salary,Department
+john,25,male,bangalore,45000,IT
+John,25,M,Bangalore,45000,IT
+PRIYA,29,FEMALE,bangalore,55000,it
+rahul,,Male,Mumbai,50000,Sales
+Sneha,31,female,MUMBAI,60000,Sales
+amit,35,Male,Delhi,not available,HR
+Anjali,27,F,Delhi,52000,HR
+rohit, ,male,delhi,48000,HR
+priya,29,female,Bangalore,55000,IT
+Vijay,40,Male,Chennai,70000,Finance
+vijay,40,m,Chennai,70000,Finance
+Kiran,unknown,Female,Bangalore,58000,IT
+`;
+
+        rawData = parseCSV(messyCSV);
+
+        analyzeData();
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        MAIN ANALYSIS
+        ------------------------------------------------
+    */
+
+    function analyzeData() {
+
+        if (!rawData.length) return;
+
+        showSection("dashboard");
+        showSection("qualitySection");
+        showSection("rawSection");
+        showSection("cleanSection");
+        showSection("statsSection");
+        showSection("chartsSection");
+
+        displayTable(rawData, "rawTable");
+
+        const headers = Object.keys(rawData[0]);
+
+        document.getElementById("totalRows").textContent =
+            rawData.length;
+
+        document.getElementById("totalColumns").textContent =
+            headers.length;
+
+
+        /*
+            Count missing values
+        */
+
+        let missing = 0;
+
+        rawData.forEach(row => {
+
+            headers.forEach(column => {
+
+                const value = row[column];
+
+                if (
+                    value === "" ||
+                    value === null ||
+                    value === undefined ||
+                    value.toLowerCase() === "unknown"
+                ) {
+                    missing++;
+                }
+
+            });
+
+        });
+
+        document.getElementById("missingValues").textContent =
+            missing;
+
+
+        /*
+            Clean data
+        */
+
+        const result = cleanData(rawData);
+
+        cleanedData = result.data;
+
+        document.getElementById("duplicatesRemoved").textContent =
+            result.duplicates;
+
+        displayTable(cleanedData, "cleanTable");
+
+        createQualityReport(missing, result);
+
+        calculateStatistics();
+
+        createCharts();
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        CLEAN DATA
+        ------------------------------------------------
+    */
+
+    function cleanData(data) {
+
+        let duplicates = 0;
+
+        const seen = new Set();
+
+        const cleaned = [];
+
+        data.forEach(originalRow => {
+
+            const row = {};
+
+            Object.keys(originalRow).forEach(key => {
+
+                let value = originalRow[key];
+
+                value = value.trim();
+
+                /*
+                    Standardize column names
+                */
+
+                const cleanKey =
+                    key.trim().toLowerCase();
+
+                /*
+                    Handle missing values
+                */
+
+                if (
+                    value === "" ||
+                    value.toLowerCase() === "unknown" ||
+                    value.toLowerCase() === "not available"
+                ) {
+
+                    value = "N/A";
+
+                }
+
+
+                /*
+                    Standardize Gender
+                */
+
+                if (cleanKey === "gender") {
+
+                    const lower =
+                        value.toLowerCase();
+
+                    if (
+                        lower === "male" ||
+                        lower === "m"
+                    ) {
+                        value = "Male";
+                    }
+
+                    else if (
+                        lower === "female" ||
+                        lower === "f"
+                    ) {
+                        value = "Female";
+                    }
+
+                }
+
+
+                /*
+                    Standardize City
+                */
+
+                if (cleanKey === "city") {
+
+                    value =
+                        value.charAt(0).toUpperCase() +
+                        value.slice(1).toLowerCase();
+
+                }
+
+
+                /*
+                    Standardize Department
+                */
+
+                if (cleanKey === "department") {
+
+                    value =
+                        value.charAt(0).toUpperCase() +
+                        value.slice(1).toLowerCase();
+
+                }
+
+
+                /*
+                    Clean numeric values
+                */
+
+                if (
+                    cleanKey === "age" ||
+                    cleanKey === "salary"
+                ) {
+
+                    if (
+                        value !== "N/A" &&
+                        !isNaN(value)
+                    ) {
+
+                        value = Number(value);
+
+                    }
+
+                }
+
+
+                row[key] = value;
+
+            });
+
+
+            /*
+                Duplicate detection
+            */
+
+            const rowKey =
+                JSON.stringify(row).toLowerCase();
+
+            if (seen.has(rowKey)) {
+
+                duplicates++;
+
+            }
+
+            else {
+
+                seen.add(rowKey);
+
+                cleaned.push(row);
+
+            }
+
+        });
+
+
+        /*
+            Fill missing numeric values
+            with column average
+        */
+
+        const headers =
+            Object.keys(cleaned[0]);
+
+        headers.forEach(column => {
+
+            const numericValues =
+                cleaned
+                    .map(row => row[column])
+                    .filter(value =>
+                        value !== "N/A" &&
+                        !isNaN(value)
+                    )
+                    .map(Number);
+
+            if (numericValues.length > 0) {
+
+                const average =
+                    numericValues.reduce(
+                        (a,b) => a + b,
+                        0
+                    ) / numericValues.length;
+
+                cleaned.forEach(row => {
+
+                    if (row[column] === "N/A") {
+
+                        row[column] =
+                            Math.round(average * 100) / 100;
+
+                    }
+
+                });
+
+            }
+
+        });
+
+
+        return {
+            data: cleaned,
+            duplicates
+        };
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        QUALITY REPORT
+        ------------------------------------------------
+    */
+
+    function createQualityReport(missing, result) {
+
+        const issues =
+            document.getElementById("issues");
+
+        issues.innerHTML = "";
+
+        if (missing > 0) {
+
+            issues.innerHTML += `
+                <div class="issue">
+                    ⚠️ ${missing} missing/unknown values detected.
+                    Missing numeric values were replaced using column averages.
+                </div>
+            `;
+
+        }
+
+        if (result.duplicates > 0) {
+
+            issues.innerHTML += `
+                <div class="issue">
+                    ⚠️ ${result.duplicates} duplicate rows detected and removed.
+                </div>
+            `;
+
+        }
+
+        issues.innerHTML += `
+            <div class="success">
+                ✅ Text categories were standardized.
+            </div>
+
+            <div class="success">
+                ✅ Numeric columns were detected and cleaned.
+            </div>
+
+            <div class="success">
+                ✅ City and department names were standardized.
+            </div>
+        `;
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        TABLE DISPLAY
+        ------------------------------------------------
+    */
+
+    function displayTable(data, elementId) {
+
+        if (!data.length) return;
+
+        const container =
+            document.getElementById(elementId);
+
+        const headers =
+            Object.keys(data[0]);
+
+        let html = "<table>";
+
+        html += "<thead><tr>";
+
+        headers.forEach(header => {
+
+            html += `<th>${header}</th>`;
+
+        });
+
+        html += "</tr></thead>";
+
+        html += "<tbody>";
+
+        data.forEach(row => {
+
+            html += "<tr>";
+
+            headers.forEach(header => {
+
+                html += `
+                    <td>${row[header]}</td>
+                `;
+
+            });
+
+            html += "</tr>";
+
+        });
+
+        html += "</tbody></table>";
+
+        container.innerHTML = html;
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        STATISTICS
+        ------------------------------------------------
+    */
+
+    function calculateStatistics() {
+
+        const headers =
+            Object.keys(cleanedData[0]);
+
+        let html = "<table>";
+
+        html += `
+            <tr>
+                <th>Column</th>
+                <th>Average</th>
+                <th>Minimum</th>
+                <th>Maximum</th>
+            </tr>
+        `;
+
+        headers.forEach(column => {
+
+            const values =
+                cleanedData
+                    .map(row => row[column])
+                    .filter(value =>
+                        value !== "N/A" &&
+                        !isNaN(value)
+                    )
+                    .map(Number);
+
+            if (values.length > 0) {
+
+                const average =
+                    values.reduce(
+                        (a,b) => a + b,
+                        0
+                    ) / values.length;
+
+                const min =
+                    Math.min(...values);
+
+                const max =
+                    Math.max(...values);
+
+                html += `
+                    <tr>
+                        <td>${column}</td>
+                        <td>${average.toFixed(2)}</td>
+                        <td>${min}</td>
+                        <td>${max}</td>
+                    </tr>
+                `;
+
+            }
+
+        });
+
+        html += "</table>";
+
+        document.getElementById("statistics").innerHTML =
+            html;
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        SIMPLE CHARTS
+        ------------------------------------------------
+    */
+
+    function createCharts() {
+
+        const headers =
+            Object.keys(cleanedData[0]);
+
+        /*
+            Find categorical column
+        */
+
+        const categoryColumn =
+            headers.find(column => {
+
+                return cleanedData.some(row =>
+                    isNaN(row[column])
+                );
+
+            });
+
+
+        /*
+            Find numeric column
+        */
+
+        const numericColumn =
+            headers.find(column => {
+
+                return cleanedData.some(row =>
+                    !isNaN(row[column])
+                );
+
+            });
+
+
+        if (categoryColumn) {
+
+            const counts = {};
+
+            cleanedData.forEach(row => {
+
+                const value =
+                    row[categoryColumn];
+
+                counts[value] =
+                    (counts[value] || 0) + 1;
+
+            });
+
+            drawBarChart(
+                "categoryChart",
+                Object.keys(counts),
+                Object.values(counts),
+                "Category Count"
+            );
+
+        }
+
+
+        if (numericColumn) {
+
+            const values =
+                cleanedData
+                    .map(row => Number(row[numericColumn]))
+                    .filter(v => !isNaN(v));
+
+            const average =
+                values.reduce(
+                    (a,b) => a + b,
+                    0
+                ) / values.length;
+
+            drawBarChart(
+                "numericChart",
+                ["Average"],
+                [average],
+                `${numericColumn} Average`
+            );
+
+        }
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        BAR CHART
+        ------------------------------------------------
+    */
+
+    function drawBarChart(
+        canvasId,
+        labels,
+        values,
+        title
+    ) {
+
+        const canvas =
+            document.getElementById(canvasId);
+
+        const ctx =
+            canvas.getContext("2d");
+
+        canvas.width = 500;
+        canvas.height = 300;
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const max =
+            Math.max(...values);
+
+        const barWidth =
+            350 / values.length;
+
+        ctx.font = "13px Arial";
+
+        values.forEach((value, index) => {
+
+            const barHeight =
+                (value / max) * 200;
+
+            const x =
+                60 + index * barWidth;
+
+            const y =
+                240 - barHeight;
+
+            ctx.fillStyle = "#2563eb";
+
+            ctx.fillRect(
+                x,
+                y,
+                barWidth - 10,
+                barHeight
+            );
+
+            ctx.fillStyle = "#111";
+
+            ctx.fillText(
+                labels[index],
+                x,
+                260
+            );
+
+            ctx.fillText(
+                Math.round(value),
+                x,
+                y - 8
+            );
+
+        });
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        DOWNLOAD CLEAN CSV
+        ------------------------------------------------
+    */
+
+    function downloadCSV() {
+
+        if (!cleanedData.length) return;
+
+        const headers =
+            Object.keys(cleanedData[0]);
+
+        let csv =
+            headers.join(",") + "\n";
+
+        cleanedData.forEach(row => {
+
+            csv +=
+                headers
+                    .map(header => {
+
+                        let value =
+                            row[header];
+
+                        if (
+                            typeof value === "string" &&
+                            value.includes(",")
+                        ) {
+
+                            value =
+                                `"${value}"`;
+
+                        }
+
+                        return value;
+
+                    })
+                    .join(",") + "\n";
+
+        });
+
+
+        const blob =
+            new Blob(
+                [csv],
+                { type: "text/csv" }
+            );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+
+        link.download =
+            "cleaned_data.csv";
+
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+    }
+
+
+    /*
+        ------------------------------------------------
+        SHOW SECTIONS
+        ------------------------------------------------
+    */
+
+    function showSection(id) {
+
+        document
+            .getElementById(id)
+            .classList.remove("hidden");
+
+    }
+
+</script>
+
+</body>
+</html>
+
